@@ -1,0 +1,102 @@
+---
+- name: Create the dockernetwork
+  docker_network:
+    name: "{{ docker_network_name }}"
+
+- name: Create the public folder volume
+  docker_volume:
+    name: public-folder
+
+- name: Create the var folder volume
+  docker_volume:
+    name: var-folder
+
+- name: Create the files directory
+  file:
+    path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/files"
+    state: directory
+
+- name: Create the config directory
+  file:
+    path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/conf.d"
+    state: directory
+
+- name: Create database container
+  docker_container:
+    name: "{{database_container_name}}"
+    image: "mariadb:latest"
+    restart_policy: "always"
+    exposed_ports:
+      - "3306"
+    networks:
+      - name: "{{ docker_network_name }}"
+    log_driver: "awslogs"
+    log_options:
+        awslogs-region: "{{cloudwatch_region}}"
+        awslogs-group: "{{cloudwatch_log_group}}"
+        awslogs-stream: "{{ database_container_name }}"
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+      MYSQL_DATABASE: "{{ database_name }}"
+      MYSQL_USER: "{{ database_user }}"
+      MYSQL_PASSWORD: "{{ database_password }}"
+
+- name: Create app container
+  docker_container:
+    name: "{{app_container_name}}"
+    image: "kimai/kimai2:fpm-alpine-1.12-prod"
+    restart_policy: "always"
+    log_driver: "awslogs"
+    log_options:
+        awslogs-region: "{{cloudwatch_region}}"
+        awslogs-group: "{{cloudwatch_log_group}}"
+        awslogs-stream: "{{app_container_name}}"
+    networks:
+      - name: "{{ docker_network_name }}"
+    volumes:
+      - public-folder:/opt/kimai/public
+      - var-folder:/opt/kimai/var
+    env:
+      APP_ENV: "prod"
+      TRUSTED_HOSTS: "{{ domain_name }}"
+      ADMINMAIL: "{{ admin_mail }}"
+      ADMINPASS: "{{ admin_pass }}"
+
+- name: Create nginx container
+  docker_container:
+    name: "{{ application_name }}-nginx"
+    image: "nginx:latest"
+    log_driver: "awslogs"
+    log_options:
+        awslogs-region: "{{cloudwatch_region}}"
+        awslogs-group: "{{cloudwatch_log_group}}"
+        awslogs-stream: "{{application_name}}-nginx"
+    restart_policy: "always"
+    exposed_ports:
+      - "80"
+    networks:
+      - name: "{{ docker_network_name }}"
+    volumes:
+      - "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/conf.d:/etc/nginx/conf.d"
+      - public-folder:/opt/kimai/public
+    env:
+      VIRTUAL_HOST: "{{ domain_name }}"
+      LETSENCRYPT_HOST: "{{ domain_name }}"
+      VIRTUAL_PORT: "80"
+
+- name: Configure nginx site
+  template:
+    src: ../templates/kimai.j2
+    dest: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/conf.d/site.conf"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Setup database backups
+  include_role:
+    name: namelivia.backups
+    tasks_from: setup-mariadb-database-backups
+
+- include_role:
+    name: namelivia.backups
+    tasks_from: setup-s3-backups
