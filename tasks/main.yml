@@ -42,7 +42,7 @@
 
 - name: Create database container
   docker_container:
-    name: "{{database_container_name}}"
+    name: "{{ database_container_name }}"
     image: "mariadb:latest"
     restart_policy: "always"
     exposed_ports:
@@ -51,9 +51,9 @@
       - name: "{{ docker_network_name }}"
     log_driver: "awslogs"
     log_options:
-        awslogs-region: "{{cloudwatch_region}}"
-        awslogs-group: "{{cloudwatch_log_group}}"
-        awslogs-stream: "{{ database_container_name }}"
+      awslogs-region: "{{ cloudwatch_region }}"
+      awslogs-group: "{{ cloudwatch_log_group }}"
+      awslogs-stream: "{{ database_container_name }}"
     env:
       MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
       MYSQL_DATABASE: "{{ database_name }}"
@@ -62,14 +62,14 @@
 
 - name: Create app container
   docker_container:
-    name: "{{app_container_name}}"
+    name: "{{ app_container_name }}"
     image: "kimai/kimai2:fpm-alpine-1.12-prod"
     restart_policy: "always"
     log_driver: "awslogs"
     log_options:
-        awslogs-region: "{{cloudwatch_region}}"
-        awslogs-group: "{{cloudwatch_log_group}}"
-        awslogs-stream: "{{app_container_name}}"
+      awslogs-region: "{{ cloudwatch_region }}"
+      awslogs-group: "{{ cloudwatch_log_group }}"
+      awslogs-stream: "{{ app_container_name }}"
     networks:
       - name: "{{ docker_network_name }}"
     volumes:
@@ -87,9 +87,9 @@
     image: "nginx:latest"
     log_driver: "awslogs"
     log_options:
-        awslogs-region: "{{cloudwatch_region}}"
-        awslogs-group: "{{cloudwatch_log_group}}"
-        awslogs-stream: "{{application_name}}-nginx"
+      awslogs-region: "{{ cloudwatch_region }}"
+      awslogs-group: "{{ cloudwatch_log_group }}"
+      awslogs-stream: "{{ application_name }}-nginx"
     restart_policy: "always"
     exposed_ports:
       - "80"
@@ -116,6 +116,7 @@
     name: namelivia.backups
     tasks_from: setup-mariadb-database-backups
 
-- include_role:
+- name: Setup S3 backups
+  include_role:
     name: namelivia.backups
     tasks_from: setup-s3-backups
