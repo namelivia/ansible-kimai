@@ -11,7 +11,7 @@ collections:
   - community.docker
 
 roles:
-  - src: https://github.com/namelivia/namelivia.kimai
+  - src: https://github.com/namelivia/ansible-kimai
 ```
 
 ## Required variables (TODO: Update these)
