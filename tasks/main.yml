@@ -34,11 +34,13 @@
   file:
     path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/files"
     state: directory
+    mode: 0700
 
 - name: Create the config directory
   file:
     path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/conf.d"
     state: directory
+    mode: 0700
 
 - name: Create database container
   docker_container:
@@ -105,7 +107,7 @@
 
 - name: Configure nginx site
   template:
-    src: ../templates/kimai.j2
+    src: kimai.j2
     dest: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/conf.d/site.conf"
     owner: root
     group: root
