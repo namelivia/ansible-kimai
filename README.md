@@ -1,4 +1,4 @@
-# Kimai Ansible role
+# Kimai Ansible role [![Ansible Lint](https://github.com/namelivia/ansible-kimai/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/namelivia/ansible-kimai/actions/workflows/ansible-lint.yml)
 
 ## This is a WIP
 
