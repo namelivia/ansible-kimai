@@ -11,7 +11,6 @@
       - database_user is defined
       - database_password is defined
       - dump_day is defined
-      - backup_day is defined
       - admin_mail is defined
       - admin_pass is defined
       - mysql_root_password is defined
@@ -44,7 +43,7 @@
 
 - name: Create database container
   docker_container:
-    name: "{{ database_container_name }}"
+    name: "{{ application_name }}-app"
     image: "mariadb:latest"
     restart_policy: "always"
     exposed_ports:
@@ -55,7 +54,7 @@
     log_options:
       awslogs-region: "{{ cloudwatch_region }}"
       awslogs-group: "{{ cloudwatch_log_group }}"
-      awslogs-stream: "{{ database_container_name }}"
+      awslogs-stream: "{{ application_name }}-database"
     env:
       MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
       MYSQL_DATABASE: "{{ database_name }}"
@@ -64,14 +63,14 @@
 
 - name: Create app container
   docker_container:
-    name: "{{ app_container_name }}"
+    name: "{{ application_name }}-app"
     image: "kimai/kimai2:fpm-alpine-1.12-prod"
     restart_policy: "always"
     log_driver: "awslogs"
     log_options:
       awslogs-region: "{{ cloudwatch_region }}"
       awslogs-group: "{{ cloudwatch_log_group }}"
-      awslogs-stream: "{{ app_container_name }}"
+      awslogs-stream: "{{ application_name }}-app"
     networks:
       - name: "{{ docker_network_name }}"
     volumes:
