@@ -4,9 +4,7 @@
     that:
       - application_name is defined
       - docker_network_name is defined
-      - app_container_name is defined
       - domain_name is defined
-      - database_container_name is defined
       - database_name is defined
       - database_user is defined
       - database_password is defined
