@@ -62,7 +62,7 @@
 - name: Create app container
   docker_container:
     name: "{{ application_name }}-app"
-    image: "kimai/kimai2:fpm-1.15.6-prod"
+    image: "kimai/kimai2:fpm-alpine-1.12-prod"
     restart_policy: "always"
     log_driver: "awslogs"
     log_options:
