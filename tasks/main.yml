@@ -79,7 +79,7 @@
       TRUSTED_HOSTS: "{{ domain_name }}"
       ADMINMAIL: "{{ admin_mail }}"
       ADMINPASS: "{{ admin_pass }}"
-      DATABASE_URL: "mysql://{{ database_user }}:{{ database_password }}@{{ application_name }}-database:3306/{{ database_name }}"
+      DATABASE_URL: "mysql://{{ database_user }}:{{ database_password|urlencode() }}@{{ application_name }}-database:3306/{{ database_name }}"
 
 - name: Create nginx container
   docker_container:
