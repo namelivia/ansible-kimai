@@ -26,6 +26,10 @@
   docker_volume:
     name: var-folder
 
+- name: Create the mysql data volumne
+  docker_volume:
+    name: mysql-data
+
 - name: Create the files directory
   file:
     path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/files"
@@ -52,6 +56,8 @@
     log_options:
       loki-url: "{{ loki_url }}"
       loki-batch-size: "400"
+    volumes:
+      - mysql-data:/var/lib/mysql
     env:
       MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
       MYSQL_DATABASE: "{{ database_name }}"
