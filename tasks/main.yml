@@ -12,8 +12,7 @@
       - admin_mail is defined
       - admin_pass is defined
       - mysql_root_password is defined
-      - cloudwatch_region is defined
-      - cloudwatch_log_group is defined
+      - loki_url is defined
 
 - name: Create the dockernetwork
   docker_network:
@@ -49,11 +48,10 @@
       - "3306"
     networks:
       - name: "{{ docker_network_name }}"
-    log_driver: "awslogs"
+    log_driver: "loki"
     log_options:
-      awslogs-region: "{{ cloudwatch_region }}"
-      awslogs-group: "{{ cloudwatch_log_group }}"
-      awslogs-stream: "{{ application_name }}-database"
+      loki-url: "{{ loki_url }}"
+      loki-batch-size: "400"
     env:
       MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
       MYSQL_DATABASE: "{{ database_name }}"
@@ -66,11 +64,10 @@
     image: "kimai/kimai2:fpm-2.0.26-prod"
     restart_policy: "always"
     cleanup: true
-    log_driver: "awslogs"
+    log_driver: "loki"
     log_options:
-      awslogs-region: "{{ cloudwatch_region }}"
-      awslogs-group: "{{ cloudwatch_log_group }}"
-      awslogs-stream: "{{ application_name }}-app"
+      loki-url: "{{ loki_url }}"
+      loki-batch-size: "400"
     networks:
       - name: "{{ docker_network_name }}"
     volumes:
@@ -88,11 +85,10 @@
     name: "{{ application_name }}-nginx"
     image: "nginx:latest"
     cleanup: true
-    log_driver: "awslogs"
+    log_driver: "loki"
     log_options:
-      awslogs-region: "{{ cloudwatch_region }}"
-      awslogs-group: "{{ cloudwatch_log_group }}"
-      awslogs-stream: "{{ application_name }}-nginx"
+      loki-url: "{{ loki_url }}"
+      loki-batch-size: "400"
     restart_policy: "always"
     exposed_ports:
       - "80"
