@@ -15,6 +15,7 @@ roles:
 ## Required variables
  - `loki_url` Loki endpoint to send logs.
  - `domain_name` The domain name in which the app will be served from.
+ - `host_port` Port to be mapped in the host machine.
  - `admin_mail` Email for the Kimai admin user.
  - `admin_pass` Password for the Kimai admin user.
  - `database_name` Name for the database Kimai will use.
