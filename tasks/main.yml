@@ -34,13 +34,13 @@
   file:
     path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/files"
     state: directory
-    mode: 0700
+    mode: "0700"
 
 - name: Create the config directory
   file:
     path: "{{ hostvars[inventory_hostname].working_directory }}{{ application_name }}/conf.d"
     state: directory
-    mode: 0700
+    mode: "0700"
 
 - name: Create database container
   docker_container:
@@ -84,7 +84,7 @@
       TRUSTED_HOSTS: "{{ domain_name }}"
       ADMINMAIL: "{{ admin_mail }}"
       ADMINPASS: "{{ admin_pass }}"
-      DATABASE_URL: "mysql://{{ database_user }}:{{ database_password|urlencode() }}@{{ application_name }}-database:3306/{{ database_name }}"
+      DATABASE_URL: "mysql://{{ database_user }}:{{ database_password | urlencode() }}@{{ application_name }}-database:3306/{{ database_name }}"
 
 - name: Create nginx container
   docker_container:
@@ -125,3 +125,10 @@
   include_role:
     name: ansible-backups
     tasks_from: setup-s3-backups
+
+- name: Setup restic backups
+  include_role:
+    name: ansible-backups
+    tasks_from: setup-restic-backups
+  vars:
+    file_path: "/var/lib/docker/volumes/mysql-data"
