@@ -132,3 +132,8 @@
     tasks_from: setup-restic-backups
   vars:
     file_path: "/var/lib/docker/volumes/mysql-data"
+
+# Restart the app container, sometimes needed for upgrades
+- name: Restart kimai
+  shell:
+    cmd: docker restart kimai-app
