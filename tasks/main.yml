@@ -67,7 +67,7 @@
 - name: Create app container
   docker_container:
     name: "{{ application_name }}-app"
-    image: "kimai/kimai2:fpm-2.6.0-prod"
+    image: "kimai/kimai2:fpm-2.11.0-prod"
     restart_policy: "always"
     cleanup: true
     log_driver: "loki"
@@ -135,5 +135,6 @@
 
 # Restart the app container, sometimes needed for upgrades
 - name: Restart kimai
-  shell:
-    cmd: docker restart kimai-app
+  command: docker restart kimai-app
+  register: restart_kimai_result
+  changed_when: restart_kimai_result.rc != 0
